@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import DoctorList from './components/DoctorList.jsx';
-import FilterPanel from './components/FilterPanel.jsx';
-import Autocomplete from './components/AutoComplete.jsx';
+import SearchBar from './components/SearchBar';
+import FilterPanel from './components/FilterPanel';
+import DoctorList from './components/DoctorList';
 
 const App = () => {
   const [doctors, setDoctors] = useState([]);
@@ -13,42 +13,63 @@ const App = () => {
     specialties: [],
     sortBy: ''
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDoctors = async () => {
-      const response = await axios.get('https://srijandubey.github.io/campus-api-mock/SRM-C1-25.json');
-      setDoctors(response.data);
-      setFilteredDoctors(response.data);
+      try {
+        setLoading(true);
+        const response = await axios.get('https://srijandubey.github.io/campus-api-mock/SRM-C1-25.json');
+        setDoctors(response.data);
+        setFilteredDoctors(response.data);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchDoctors();
   }, []);
 
   return (
-    <div>
-      <h1>Doctor Listing</h1>
-      <Autocomplete 
-        searchTerm={searchTerm} 
-        setSearchTerm={setSearchTerm} 
-        doctors={doctors} 
-        setFilteredDoctors={setFilteredDoctors} 
-      />
-      <FilterPanel filters={filters} setFilters={setFilters} setFilteredDoctors={setFilteredDoctors} doctors={doctors} />
-      <DoctorList doctors={filteredDoctors} />
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-blue-700 py-4 px-4 shadow-md">
+        <div className="max-w-7xl mx-auto">
+          <div className="relative">
+            <SearchBar 
+              searchTerm={searchTerm} 
+              setSearchTerm={setSearchTerm} 
+              doctors={doctors} 
+              setFilteredDoctors={setFilteredDoctors} 
+            />
+          </div>
+        </div>
+      </header>
+      
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="w-full md:w-1/4">
+            <FilterPanel 
+              filters={filters} 
+              setFilters={setFilters} 
+              setFilteredDoctors={setFilteredDoctors} 
+              doctors={doctors} 
+            />
+          </div>
+          
+          <div className="w-full md:w-3/4">
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-700"></div>
+              </div>
+            ) : (
+              <DoctorList doctors={filteredDoctors} />
+            )}
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
-

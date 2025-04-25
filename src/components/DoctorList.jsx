@@ -1,15 +1,20 @@
-import React from 'react';
+import DoctorCard from "./DoctorCard";
 
 const DoctorList = ({ doctors }) => {
+  if (doctors.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 text-center">
+        <p className="text-gray-500">
+          No doctors found matching your criteria.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      {doctors.map(doctor => (
-        <div key={doctor.id} data-testid="doctor-card">
-          <h4 data-testid="doctor-name">{doctor.name}</h4>
-          <p data-testid="doctor-specialty">{doctor.specialities.map(s => s.name).join(', ')}</p>
-          <p data-testid="doctor-experience">{doctor.experience} years of experience</p>
-          <p data-testid="doctor-fee">Fee: ${doctor.fee}</p>
-        </div>
+    <div className="space-y-4">
+      {doctors.map((doctor, index) => (
+        <DoctorCard key={doctor.id || index} doctor={doctor} />
       ))}
     </div>
   );
